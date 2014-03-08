@@ -1,21 +1,19 @@
 var redis = require("redis")
   , client = redis.createClient()
-  , async = require("async")
   , socketHandler = require('../controllers/socket-io/socket.js');
-
 
 client.on("error", function (err) {
   console.log("Error " + err);
 });
 
-exports.all = function(){
+exports.all = function(callback){
 
   client.llen("history", function(err, length){ // get length
 
     client.lrange("history", 0, length, function(err, list){ // get list content
       
-      socketHandler.update(list);
-      // socket.emit("history", list);
+      // socketHandler.update(list);
+      if(callback) callback(list);
       
     });
 
@@ -23,12 +21,13 @@ exports.all = function(){
 
 }
 
-exports.create = function(msg){
+exports.create = function(msg, callback){
 
   console.log("create");
   client.rpush("history", [msg], function(err, num){ 
 
-    socketHandler.update(msg);
+    // socketHandler.update(msg);
+    callback();
       
   });
     

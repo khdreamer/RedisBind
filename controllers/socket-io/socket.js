@@ -8,11 +8,19 @@ exports.connect = function(s){
   console.log("connection");
 
   socket = s;
-  db.all();
+  db.all(function(list){
+
+    exports.update(list);
+
+  });
 
   // listen to new message
   socket.on('message', function (data) {
-    db.create(data);
+    db.create(data, function(){
+
+      exports.update(data);
+
+    });
   });
 
 };
