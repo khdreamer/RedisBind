@@ -5,6 +5,6 @@ block content
     h1= title
     p Welcome to #{title}
     ul
-      li(ng-repeat="h in history track by $index") {{h}}
+      li(ng-repeat="h in history track by $index" ng-bind="h")
     input#messageBox(type="text" message-box ng-model="message")
 

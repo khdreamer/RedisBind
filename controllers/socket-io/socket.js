@@ -1,33 +1,41 @@
 var db = require("../../models/db.js")
   , redis = require("redis");
 
-var socket;
+module.exports = function(io){
 
-exports.connect = function(s){
+  this.connect = function(socket){
 
-  console.log("connection");
+    console.log("connection");
 
-  socket = s;
-  db.all(function(list){
-
-    exports.update(list);
-
-  });
-
-  // listen to new message
-  socket.on('message', function (data) {
-    db.create(data, function(){
-
-      exports.update(data);
-
+    // return all history meassages
+    db.all(function(list){
+      this.all(socket, list);
     });
-  });
 
-};
+    // listen to new message
+    socket.on('message', function (msg) {
+      db.create(msg, function(){
 
-exports.update = function(data){
+        this.update([msg]);
 
-  socket.emit("history", data);
+      });
+    });
+
+  };
+
+  this.update = function(msg){
+
+    io.sockets.emit('new', msg);
+
+  };
+
+  this.all = function(socket, data){
+
+    socket.emit('history', data);
+
+  };
+
+  return this;
 
 }
 
